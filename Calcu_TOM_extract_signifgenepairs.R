@@ -112,7 +112,7 @@ result <- data.frame(stringsAsFactors = FALSE)
 for (i in 1:(nrow(TOM)-1)){
   for (j in (i+1):nrow(TOM)){
     if (TOM[i,j] > 0.15){
-      tmp.result=data.frame(rownames(TOM[i,]),rownames(TOM[j,]),TOM[i,j],i,j,stringsAsFactors = FALSE)
+      tmp.result <- data.frame(rownames(TOM[i,]),rownames(TOM[j,]),TOM[i,j],i,j,stringsAsFactors = FALSE)
       names(tmp.result) <- c('gene1','gene2','TOM','i','j')
       result <- rbind(result, tmp.result)
       names(result) <- c('gene1','gene2','TOM','i','j')
