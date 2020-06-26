@@ -1,6 +1,6 @@
-#==============
+#====================
 #Data preparation
-#==============
+#====================
 setwd('/your path/')
 expro<-read.table("your expression data file name", header = T,  sep = "\t",check.names=F)
 options(stringsAsFactors = FALSE)
@@ -20,9 +20,9 @@ library(WGCNA)
 gsg = goodSamplesGenes(datExpr0, verbose = 3)
 gsg$allOK
 
-#=====================================
+#======================================
 # Sample clustering to detect outliers
-#=====================================
+#======================================
 sampleTree = hclust(dist(datExpr0), method = "average"); 
 # Plot the sample tree: Open a graphic output window of size 12 by 9 inches 
 # The user should change the dimensions if the window is too large or too small. 
@@ -56,9 +56,9 @@ enableWGCNAThreads()
 #lnames = load(file = "G-01-dataInput.RData"); 
 #The variable lnames contains the names of loaded variables. 
 #lnames 
-#====================================
+#==============================================
 #  1) choose the most suitable soft threshold
-#====================================
+#==============================================
 # Choose a set of soft-thresholding powers 
 powers = c(c(1:10), seq(from = 12, to=24, by=2)) 
 # Call the network topology analysis function 
@@ -93,29 +93,29 @@ sizeGrWindow(10,5)
 par(mfrow=c(1,2)) 
 hist(k) 
 scaleFreePlot(k, main="Check scale free topology\n") 
-#=========================
+#=======================================
 #  2) Calculate the adjacency matrix
-#=========================
+#=======================================
 softPower = 12; 
 adjacency = adjacency(datExpr, power = softPower) 
-#================================ 
+#======================================================
 #  3) Calculate the final topological overlap matrix
-#================================
+#======================================================
 TOM = TOMsimilarity(adjacency);
 dimnames(TOM)=dimnames(adjacency)
 TOM=as.data.frame(TOM)
 
-#=====================================
+#==========================================================
 #Extract strongly interacted gene pairs with TOM >= 0.15
-#=====================================
+#==========================================================
 result <- data.frame(stringsAsFactors = FALSE) 
 for (i in 1:(nrow(TOM)-1)){
   for (j in (i+1):nrow(TOM)){
-    if (TOM[i,j]>0.15){
+    if (TOM[i,j] > 0.15){
       tmp.result=data.frame(rownames(TOM[i,]),rownames(TOM[j,]),TOM[i,j],i,j,stringsAsFactors = FALSE)
-      names(tmp.result)=c('gene1','gene2','TOM','i','j')
+      names(tmp.result) <- c('gene1','gene2','TOM','i','j')
       result <- rbind(result, tmp.result)
-      names(result)=c('gene1','gene2','TOM','i','j')
+      names(result) <- c('gene1','gene2','TOM','i','j')
       as.numeric(as.character(result[nrow(result),3])) 
       as.numeric(as.character(result[nrow(result),4]))
       as.numeric(as.character(result[nrow(result),5]))
