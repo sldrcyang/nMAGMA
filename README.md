@@ -11,6 +11,6 @@ nMAGMA is an approach to intergrate Hi-C, eQTL and TOM matrix of gene expression
 * __Merge_annot_files.R__: Your can use this script to merge to .genes.annot file in order to expand the annotation. This result file can directly used as input for gene-analysis in MGAMA. By merging the original MAGMA annotation file and three kind of .annot files we provides, you can get the final T-MAGMA annotation file used in our paper.
 * __Extended LDSC to GSA.R__: This is the LD Score regression extended to gene-set analysis. First a gene-geneset matrix is created and then the LD score and chisq statistics of each gene set are calculated. Your can detect from the regression intercept that whether the inflation of statistics in gene-set analysis are caused by confounding factors or the complex pathogenesis of the disease. 
 ## Reference
-1. 
+1. nMAGMA: a network enhanced method for inferring risk genes from GWAS summary statistics and its application to schizophrenia.
 2. De Leeuw C A , Mooij J M , Heskes T , et al. MAGMA: generalized gene-set analysis of GWAS data.[J]. PLoS Computational Biology, 2015, 11(4):e1004219.
 3. Langfelder P, Horvath S. WGCNA: an R package for weighted correlation network analysis[J]. BMC bioinformatics, 2008, 9(1): 559.
