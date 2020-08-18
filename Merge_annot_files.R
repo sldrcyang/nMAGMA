@@ -37,7 +37,7 @@ annot <- annot_comb %>% group_by(gene) %>% summarise(snp = paste(snp, collapse =
 annot <- merge(gene_bp,annot,by="gene")
 write.table(annot,"Intermediate.genes.annot",row.names = F,col.names=F,sep="\t",quote=F)
 
-#Remove duplicate snp on the same gene
+#Remove duplicate SNPs on the same gene
 data <- readLines("Intermediate.genes.annot")
 data <- as.list(data)
 temp <- list()
