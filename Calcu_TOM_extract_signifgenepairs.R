@@ -8,7 +8,7 @@ dim(expro)
 
 #Select genes in the top fifth of the variance across samples
 m.vars=apply(expro,1,var) 
-expro.upper=expro[which(m.vars>quantile(m.vars, probs = seq(0, 1, 0.2))[5]),]#4是指0.75
+expro.upper=expro[which(m.vars>quantile(m.vars, probs = seq(0, 1, 0.2))[5]),]
 dim(expro.upper)
 write.table(expro.upper,file="geneInput_variancetop0.2.txt",sep='\t ',quote=F,row.names=T)
 
@@ -35,7 +35,7 @@ plot(sampleTree, main = "Sample clustering to detect outliers", sub="", xlab="",
 abline(h = 110000, col = "red"); 
 # Determine cluster under the line 
 clust = cutreeStatic(sampleTree, cutHeight = 110000, minSize = 10) 
-table(clust) #table记录频数
+table(clust) 
 # clust 1 contains the samples we want to keep. 
 keepSamples = (clust==1) 
 datExpr = datExpr0[keepSamples, ]
