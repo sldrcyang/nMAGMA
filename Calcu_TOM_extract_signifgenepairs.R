@@ -96,7 +96,7 @@ scaleFreePlot(k, main="Check scale free topology\n")
 #=======================================
 #  2) Calculate the adjacency matrix
 #=======================================
-softPower = 12; 
+softPower = beta; 
 adjacency = adjacency(datExpr, power = softPower) 
 #======================================================
 #  3) Calculate the final topological overlap matrix
@@ -111,7 +111,7 @@ TOM=as.data.frame(TOM)
 result <- data.frame(stringsAsFactors = FALSE) 
 for (i in 1:(nrow(TOM)-1)){
   for (j in (i+1):nrow(TOM)){
-    if (TOM[i,j] > 0.15){
+    if (TOM[i,j] >= 0.15){
       tmp.result <- data.frame(rownames(TOM[i,]),rownames(TOM[j,]),TOM[i,j],i,j,stringsAsFactors = FALSE)
       names(tmp.result) <- c('gene1','gene2','TOM','i','j')
       result <- rbind(result, tmp.result)
