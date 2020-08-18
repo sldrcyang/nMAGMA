@@ -14,7 +14,7 @@ for(i in 1:length(gs)){
   matrix[,i]=0
   genelist[[i]] <- temp[-1]
   genelist[[i]]=as.vector(genelist[[i]])
-  #find the location of each gene in the gene set
+  
   generows[[i]]=as.vector(na.omit(as.vector(match(genelist[[i]],g$GENE))))
   if(length(generows[[i]]>0)){
   matrix[generows[[i]],i]=1
@@ -54,7 +54,7 @@ for(i in 1:length(ld)){
 data=data.frame(chi=chi,ld=ld,w=w,stringsAsFactors = F)
 data=data[!(is.na(data$chi)),]
 data=data[!(is.na(data$ld)),]
-data=data[-which(data$chi>150),]  #Remove extreme values
+data=data[-which(data$chi>150),]
 
 lm.reg <- lm((data$chi)~(data$ld),weights = data$w)
 lm.reg$coefficients
