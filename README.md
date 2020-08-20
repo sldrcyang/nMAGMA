@@ -1,5 +1,5 @@
 # nMAGMA
-nMAGMA is an approach to intergrate Hi-C, eQTL and TOM matrix of gene expression calculated by WGCNA into default physical location mapping based MGAMA annotation.
+nMAGMA is an approach to intergrate Hi-C, eQTL and gene networks inferred from WGCNA into default physical-location-based MGAMA annotation.
 ## List of files
 * __RE_to_genes.zip__: *3DIV_DLPFC_RE_to_genes.txt,3DIV_Hippocampus_RE_to_genes.txt,3DIV_Liver_RE_to_genes.txt,3DIV_Small_Bowell_RE_to_genes.txt.* This file contains RE-gene regulatory relationships obtained from Hi-C.
 * __Signifgenepairs.zip__: *Cortex_signifgenepairs.txt,Hippocampus_signifgenepairs.txt,Liver_signifgenepairs.txt,Small_Bowel_signifgenepairs.txt.* This file contains significant gene pairs with TOM >= 0.15.
