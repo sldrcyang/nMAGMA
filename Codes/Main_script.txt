@@ -1,0 +1,230 @@
+# This is a tutorial on how to conduct nMAGMA, which can be used to reproduce the results in our manuscript. 
+# There are totally 5 steps to retain the final nMAGMA results.
+
+# nMAGMA is performed on R and MAGMA version 1.07b, downloaded from [MAGMA v1.07b (https://ctg.cncr.nl/software/magma)]
+
+## Data summary
+# The SCZ GWAS summary = scz.swe.pgc1.2013-11b.zip and 49eur.daner_PGC_SCZ49.sh2_mds10_1000G-frq_2.gz can be downloaded from PGC database: https://www.med.unc.edu/pgc/download-results/scz/
+
+# For eQTL data and gene expression data, we downloaded them at GTEx database: https://storage.googleapis.com/gtex_analysis_v8/single_tissue_qtl_data/GTEx_Analysis_v8_eQTL.tar; https://storage.googleapis.com/gtex_analysis_v8/rna_seq_data/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_median_tpm.gct.gz
+
+# For Hi-C data, we download them at 3D-genome Interaction Viewer and database:  http://kobic.kr/3div.
+
+# Before analyzing, you should extract your matched interested tissues before analysis and unify the gene and snp coordinate format of each data set; 
+# The protein-coding gene loc we used are all transformed to Ensembl (GRCH37 v87), the SNPs are transformed to dbSNP (version 151), and the regulatory elements (REs) defined in ENCODE [27] (https://www.encodeproject.org/files/ENCFF301VRH/) and Ensembl (ftp://ftp.ensembl.org/pub/grch37/release-94/regulation/homo_sapiens/). 
+
+
+##############
+### Step 1 ### 
+##############
+# Annotate SNPs to genes
+magma_v1.07b_static/magma –annotate \
+--snp-loc SNPLOC.txt \
+--gene-loc protein_coding_gene.loc \
+--out snp_to_gene
+
+# Annotate SNPs to REs
+magma_v1.07b_static/magma –annotate \
+--snp-loc SNPLOC.txt \
+--gene-loc RELOC.txt \
+--out snp_to_re
+
+
+###############
+### Step 2 ###
+###############
+# R is used to get the three annotate files: Tissue_Hi-C.genes.annot, Tissue_eqtl.genes.annot, Tissue_TOM.genes.annot. 
+# The three kinds of files derived in manuscript are also available at our Github repo, you can also download them and skip to step 3.
+
+
+#===========================
+# Creating Hi-C annotate files
+#===========================
+# For creating Hi-C annotate files, we assign the SNPs to genes via SNP-to-RE annotations and RE-gene regulatory pairs.
+
+snp_to_re <- readLines("snp_to_re.genes.annot")
+re_to_gene <- read.table("3DIV_Tissue_RE_to_genes.txt",header = F,  sep = "\t",stringsAsFactors = F)
+library(dplyr)
+re <- c()
+snp <- c()
+for(i in 1:length(snp_to_re)){
+  temp <- unlist(strsplit(snp_to_re[i], "\t"))
+  re[i] <- temp[1]
+  snp[i] <- paste(temp[-2:-1],collapse=" ")
+}
+snp_to_re2 <- data.frame(re=re,snp=snp,stringsAsFactors = FALSE)
+b <- intersect(re_to_gene[,1],snp_to_re2[,1])
+b <- as.vector(b)
+re_to_gene <- subset(re_to_gene,re_to_gene$V1%in%b)
+snp_to_re2 <- subset(snp_to_re2,snp_to_re2[,1]%in%b)
+snp_to_gene <- merge(re_to_gene,snp_to_re2,by.x="V1",by.y="re",all.x=T)
+snp_to_gene <- snp_to_gene[,-1]
+
+names(snp_to_gene)=c("gene","snp")
+snp_to_gene <- snp_to_gene %>% group_by(gene) %>% summarise(snp = paste(snp, collapse = " "))
+
+# add gene coordinates
+gene_bp <- read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
+library(tidyr)
+gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
+gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
+gene_bp=gene_bp[,c(1,2)]
+final_snp_to_gene <- merge(snp_to_gene,gene_bp,by.x="gene",by.y="V1",all.x=T)
+write.table(final_snp_to_gene,"Intermediate.genes.annot",row.names = F,col.names=F,sep="\t",quote=F)
+
+#Remove duplicate SNPs on the same gene
+data <- readLines("Intermediate.genes.annot")
+data <- as.list(data)
+temp <- list()
+for(i in 1:length(data)){
+  temp[[i]] <- unlist(strsplit(data[[i]], "\t"))
+  temp[[i]] <- as.vector(temp[[i]])
+  temp[[i]] <- unique(temp[[i]])
+}
+file.remove('Intermediate.genes.annot')
+for(i in 1:length(temp)){
+  cat(temp[[i]], file = "Tissue_Hi-C.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
+  cat("\n", file = "Tissue_Hi-C.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
+}
+
+#========================
+# Creating eQTL annotate files
+#========================
+# the gene-snp significant pairs should be first extracted from GTEx files, which is like:
+# Gene1 SNP1
+# Gene2 SNP2
+# .....
+
+signifpairs <- read.table("Tissue.signifpairs.txt", header = F,  sep = "\t",stringsAsFactors = F)
+names(signifpairs) <- c(”gene”, “snp”)
+snp_to_gene <- signifpairs %>% group_by(gene) %>% summarise(snp = paste(snp, collapse = " "))
+
+# add gene coordinates
+gene_bp=read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
+library(tidyr)
+gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
+gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
+gene_bp <- gene_bp[,c(1,2)]
+final_snp_to_gene <- merge(snp_to_gene, gene_bp,by.x="gene",by.y="V1",all.x=T)
+write.table(final_snp_to_gene,"Intermediate.genes.annot",row.names = F,col.names=F,sep="\t",quote=F)
+
+#Remove duplicate SNPs on the same gene
+data <- readLines("Intermediate.genes.annot")
+data <- as.list(data)
+temp <- list()
+for(i in 1:length(data)){
+  temp[[i]] <- unlist(strsplit(data[[i]], "\t"))
+  temp[[i]] <- as.vector(temp[[i]])
+  temp[[i]] <- unique(temp[[i]])
+}
+file.remove('Intermediate.genes.annot')
+for(i in 1:length(temp)){
+  cat(temp[[i]], file = " Tissue_eqtl.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
+  cat("\n", file = " Tissue_eqtl.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
+}
+
+#====================================================================================
+# For calculating significant gene pairs based on their expression data, script Calcu_TOM_extract_signifgenepairs.R is used
+# The output file: Tissue.0.15.TOM.signifgenepairs.txt
+#====================================================================================
+
+#========================
+# Creating TOM annotate files
+#========================
+# We first annotate eqtls to genes highly connected with their eGenes (TOM>=0.15)
+
+genepairs <- read.table("Tissue.0.15.TOM.signifgenepairs.txt", header = T,  sep = "\t",check.names=F,stringsAsFactors = F)
+data <- readLines("Tissue.signifpairs.txt") #this file is derived in the last step
+library(dplyr)
+gene <- c()
+bp <- c()
+snp <- c()
+for (i in 1:length(data)){
+  temp <- unlist(strsplit(data[i], "\t"))
+  gene[i] <- temp[1]
+  bp[i] <- temp[2]
+  snp[i] <- paste(temp[-2:-1],collapse = " ")
+}
+data1 <- data.frame(gene=gene,snp=snp,stringsAsFactors = F)
+
+b <- union(intersect(genepairs$gene1_name, data1$gene), intersect(genepairs$gene2_name, data1$gene)) #genes that can be expanded
+genepairs2 <- subset(genepairs,(genepairs$gene1_name%in%b) | (genepairs$gene2_name%in%b)) #gene pairs that exist at least one genes having eqtls
+
+genepairs2 <- genepairs2[,-3:-5]
+genepairs3 <- merge(genepairs2,data1,by.x='gene1_name',by.y='gene',all.x=T)
+names(genepairs3) <- c("gene1_name","gene2_name",'snp_of_gene1')
+genepairs3 <- merge(genepairs3,data1,by.x='gene2_name',by.y='gene',all.x=T)
+genepairs3 <- genepairs3[,c(2,3,1,4)]
+names(genepairs3) <- c("gene1_name",'snp_of_gene1',"gene2_name",'snp_of_gene2')
+
+genepairs3[is.na(genepairs3)] <- "" 
+
+library(tidyr)
+genepairs4 <- tidyr::unite(genepairs3, "snp1+snp2", snp_of_gene1, snp_of_gene2, sep = " ", remove = F)
+genepairs4$`snp1+snp2`=trimws(genepairs4$`snp1+snp2`,"both") #Remove spaces at both ends
+gene1 <- genepairs4[,c(1,2)]
+gene2 <- genepairs4[,c(4,2)]
+names(gene2) <- names(gene1)
+gene_tot <- rbind(gene1,gene2) 
+gene_tot1 <- subset(gene_tot,gene_tot$gene1_name%in%gene_bp$V1) #genes after expanded
+names(gene_tot1) <- c("gene","snp")
+
+expanded_gene_eqtl <- gene_tot1 %>% group_by(gene) %>% summarise(snp = paste(snp, collapse = " "))
+
+#read gene loc
+gene_bp <- read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
+library(tidyr)
+gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
+gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
+gene_bp <- gene_bp[,c(1,2)]
+
+x <- merge(gene_bp,expanded_gene_eqtl,by.x="V1",by.y='gene',all.y=T)
+write.table(x,file="Intermediate.genes.annot",sep=" ",row.names=F,col.names=F,quote=F)
+
+#Remove duplicate SNPs on the same gene
+data <- readLines("Intermediate.genes.annot")
+data <- as.list(data)
+library(dplyr)
+temp <- list()
+for(i in 1:length(data)){
+  temp[[i]] <- unlist(strsplit(data[[i]], " "))
+  temp[[i]] <- as.vector(temp[[i]])
+  temp[[i]] <- unique(temp[[i]])
+}
+file.remove('Intermediate.genes.annot')
+for (i in 1:length(temp)){
+  cat(temp[[i]], file = "Tissue_TOM.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
+  cat("\n", file = "Tissue_TOM.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
+}
+
+
+#################
+### Step 3 ###
+#################
+# Script Merge_annot_files.R is used in this step repeatedly to merge snp_to_gene.genes.annot, Tissue_Hi-C.genes.annot, Tissue_eqtl.genes.annot, Tissue_TOM.genes.annot.  
+# Then you get a final snp-to-gene annotate file, provided that it is named Tissue.merge.genes.annot.
+
+
+#############
+### Step 4 ###
+#############
+# perform gene analysis using MAGMA
+magma_v1.07b_static/magma --bfile g1000_eur \
+--pval GWAS_summary.txt \
+--gene-annot Tissue.merge.genes.annot \
+--gene-model snp-wise=mean \
+--out Tissue.merge.gene_analysis.mean
+
+# Meta analysis
+# If you have analyzed several GWAS summary datasets, your can merge them using MAGMA
+magma_v1.07b_static/magma --meta raw= Tissue.merge1.gene_analysis.mean.genes.raw, Tissue.merge2.gene_analysis.mean.genes.raw \
+--out Tissue.merge.gene_analysis.mean
+
+
+##############
+### Step 5 ###
+##############
+# perform gene-set analysis using MAGMA
+magma_v1.07b_static/magma --gene-results Tissue.merge.gene_analysis.mean.genes.raw \
+--set-annot gene-set.txt \
+--out Tissue.merge.geneset_analysis.mean
