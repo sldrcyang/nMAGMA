@@ -31,15 +31,15 @@ gene_bp2 <- data.frame(gene=gene,bp=bp,stringsAsFactors = FALSE)
 
 #Merge
 annot_comb <- rbind(annot1,annot2)
-gene_bp <- rbind(gene_bp1,gene_bp2)
-gene_bp <- gene_bp[!duplicated(gene_bp$gene),]
-
 #If the annotate files contains some non-coding genes, and you want retain only coding genes
-#gene_bp=read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
-#library(tidyr)
-#gene_bp=tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
-#gene_bp=tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
-#gene_bp=gene_bp[,c(1,2)]
+gene_bp=read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
+library(tidyr)
+gene_bp=tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
+gene_bp=tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
+gene_bp=gene_bp[,c(1,2)]
+#If you have retained coding genes when you generating annotation files
+#gene_bp <- rbind(gene_bp1,gene_bp2)
+#gene_bp <- gene_bp[!duplicated(gene_bp$gene),]
 
 annot <- annot_comb %>% group_by(gene) %>% summarise(snp = paste(snp, collapse = "\t"))
 annot <- merge(gene_bp,annot,by="gene",all=F)
