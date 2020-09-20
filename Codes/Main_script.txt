@@ -10,7 +10,7 @@
 
 # For Hi-C data, we download them at 3D-genome Interaction Viewer and database:  http://kobic.kr/3div.
 
-# Before analyzing, you should unify the gene and snp coordinate format between different resources; 
+# Before analyzing, you should unify the gene and snp coordinate formats between different resources; 
 # In our manuscript, the protein-coding gene loc we used are all transformed to Ensembl (GRCH37 v87), the SNPs are transformed to dbSNP (version 151), and the regulatory elements (REs) defined in ENCODE [27] (https://www.encodeproject.org/files/ENCFF301VRH/) and Ensembl (ftp://ftp.ensembl.org/pub/grch37/release-94/regulation/homo_sapiens/). 
 
 
