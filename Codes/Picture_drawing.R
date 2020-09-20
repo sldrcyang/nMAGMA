@@ -1,5 +1,5 @@
 #===================
-#Boxplot
+# Boxplot
 #===================
 Orig <- read.table("gene_analysis.mean.genes.out",header = T,sep = "\t",check.names=F,stringsAsFactors = F)
 
@@ -100,7 +100,7 @@ legend(3.4, 1040,col="black", c("MAGMA", "MAGMA+eqtl", "MAGMA+Hi-C","MAGMA+Hi-C+
 
 
 #===============
-#Venn digram
+# Venn digram
 #===============
 library(VennDiagram)
 x1 <- read.table("signifcant genes in MAGMA.txt", header = T,  sep = "\t",stringsAsFactors = F)
@@ -130,7 +130,7 @@ venn.diagram(venn_data,
 
 
 #===========
-#QQ plot
+# QQ plot
 #===========
 library("qqman")
 f1 <- read.table("Cortex.merge.geneset_analysis.mean.gsa.out", header = T,  sep = "\t",stringsAsFactors = F)
