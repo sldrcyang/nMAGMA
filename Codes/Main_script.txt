@@ -10,8 +10,8 @@
 
 # For Hi-C data, we download them at 3D-genome Interaction Viewer and database:  http://kobic.kr/3div.
 
-# Before analyzing, you should extract your matched interested tissues before analysis and unify the gene and snp coordinate format of each data set; 
-# The protein-coding gene loc we used are all transformed to Ensembl (GRCH37 v87), the SNPs are transformed to dbSNP (version 151), and the regulatory elements (REs) defined in ENCODE [27] (https://www.encodeproject.org/files/ENCFF301VRH/) and Ensembl (ftp://ftp.ensembl.org/pub/grch37/release-94/regulation/homo_sapiens/). 
+# Before analyzing, you should unify the gene and snp coordinate format between different resources; 
+# In our manuscript, the protein-coding gene loc we used are all transformed to Ensembl (GRCH37 v87), the SNPs are transformed to dbSNP (version 151), and the regulatory elements (REs) defined in ENCODE [27] (https://www.encodeproject.org/files/ENCFF301VRH/) and Ensembl (ftp://ftp.ensembl.org/pub/grch37/release-94/regulation/homo_sapiens/). 
 
 
 ##############
@@ -33,13 +33,13 @@ magma_v1.07b_static/magma –annotate \
 ###############
 ### Step 2 ###
 ###############
-# R is used to get the three annotate files: Tissue_Hi-C.genes.annot, Tissue_eqtl.genes.annot, Tissue_TOM.genes.annot. 
+# R is used to generate the three annotate files: Tissue_Hi-C.genes.annot, Tissue_eqtl.genes.annot, Tissue_TOM.genes.annot. 
 # The three kinds of files derived in manuscript are also available at our Github repo, you can also download them and skip to step 3.
 
 
-#===========================
+#==============================
 # Creating Hi-C annotate files
-#===========================
+#==============================
 # For creating Hi-C annotate files, we assign the SNPs to genes via SNP-to-RE annotations and RE-gene regulatory pairs.
 
 snp_to_re <- readLines("snp_to_re.genes.annot")
@@ -87,10 +87,10 @@ for(i in 1:length(temp)){
   cat("\n", file = "Tissue_Hi-C.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
 }
 
-#========================
+#==============================
 # Creating eQTL annotate files
-#========================
-# the gene-snp significant pairs should be first extracted from GTEx files, which is like:
+#==============================
+# the tissue-specific gene-snp significant pairs should be first extracted from GTEx files, named as 'Tissue.signifpairs.txt', which is like:
 # Gene1 SNP1
 # Gene2 SNP2
 # .....
@@ -123,18 +123,18 @@ for(i in 1:length(temp)){
   cat("\n", file = " Tissue_eqtl.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
 }
 
-#====================================================================================
+#=============================================================================================================================
 # For calculating significant gene pairs based on their expression data, script Calcu_TOM_extract_signifgenepairs.R is used
 # The output file: Tissue.0.15.TOM.signifgenepairs.txt
-#====================================================================================
+#=============================================================================================================================
 
-#========================
+#==============================
 # Creating TOM annotate files
-#========================
+#==============================
 # We first annotate eqtls to genes highly connected with their eGenes (TOM>=0.15)
 
 genepairs <- read.table("Tissue.0.15.TOM.signifgenepairs.txt", header = T,  sep = "\t",check.names=F,stringsAsFactors = F)
-data <- readLines("Tissue.signifpairs.txt") #this file is derived in the last step
+data <- readLines("Tissue.signifpairs.txt") #this file is also an input file for the step of 'Creating eQTL annotate files'
 library(dplyr)
 gene <- c()
 bp <- c()
@@ -203,11 +203,11 @@ for (i in 1:length(temp)){
 #################
 # Script Merge_annot_files.R is used in this step repeatedly to merge snp_to_gene.genes.annot, Tissue_Hi-C.genes.annot, Tissue_eqtl.genes.annot, Tissue_TOM.genes.annot.  
 # Then you get a final snp-to-gene annotate file, provided that it is named Tissue.merge.genes.annot.
+# In this step, you can also get annotate files of MAGMA+eQTL, MAGMA+Hi-C and MAGMA+Hi-C+eQTL, which were mentioned in our manuscript.
 
-
-#############
+##############
 ### Step 4 ###
-#############
+##############
 # perform gene analysis using MAGMA
 magma_v1.07b_static/magma --bfile g1000_eur \
 --pval GWAS_summary.txt \
@@ -216,7 +216,7 @@ magma_v1.07b_static/magma --bfile g1000_eur \
 --out Tissue.merge.gene_analysis.mean
 
 # Meta analysis
-# If you have analyzed several GWAS summary datasets, your can merge them using MAGMA
+# If you have  several GWAS summary datasets, your can merge them using MAGMA
 magma_v1.07b_static/magma --meta raw= Tissue.merge1.gene_analysis.mean.genes.raw, Tissue.merge2.gene_analysis.mean.genes.raw \
 --out Tissue.merge.gene_analysis.mean
 
