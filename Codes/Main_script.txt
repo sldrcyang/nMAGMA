@@ -90,16 +90,17 @@ for(i in 1:length(temp)){
 #==============================
 # Create eQTL annotate files
 #==============================
-# the tissue-specific gene-snp significant pairs should be first extracted from GTEx files, named as 'Tissue.signifpairs.txt', which is like:
+# The tissue-specific gene-snp significant pairs should be first extracted from GTEx files, named as 'Tissue.signifpairs.txt', which is like:
 # Gene1 SNP1
 # Gene2 SNP2
-# .....
+# Gene3 SNP3
+# ...   ...
 
 signifpairs <- read.table("Tissue.signifpairs.txt", header = F,  sep = "\t",stringsAsFactors = F)
-names(signifpairs) <- c(”gene”, “snp”)
+names(signifpairs) <- c('gene', 'snp')
 snp_to_gene <- signifpairs %>% group_by(gene) %>% summarise(snp = paste(snp, collapse = " "))
 
-# add gene coordinates
+# add gene coordinates (this step can also be performed directly in the Step 3, Merge_annot_files.R)
 gene_bp=read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
 library(tidyr)
 gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
@@ -124,17 +125,21 @@ for(i in 1:length(temp)){
 }
 
 #=============================================================================================================================
-# For calculating significant gene pairs based on their expression data, script Calcu_TOM_extract_signifgenepairs.R is used
-# The output file: Tissue.0.15.TOM.signifgenepairs.txt
+# For calculating significant gene pairs based on their expression data, script Calcu_TOM_extract_signifgenepairs.R is used;
+# The output file is named as 'Tissue.0.15.TOM.signifgenepairs.txt', which is like:
+# Gene1 Gene2 tol_val1 row_num1 col_num1
+# Gene1 Gene3 tol_val2 row_num2 col_num2
+# Gene2 Gene4 tol_val3 row_num3 col_num3
+# ...   ...
 #=============================================================================================================================
 
 #==============================
 # Create TOM annotate files
 #==============================
-# We first annotate eqtls to genes highly connected with their eGenes (TOM>=0.15)
+# We first annotate eQTLs to genes highly connected with their eGenes (TOM>=0.15)
 
 genepairs <- read.table("Tissue.0.15.TOM.signifgenepairs.txt", header = T,  sep = "\t",check.names=F,stringsAsFactors = F)
-data <- readLines("Tissue.signifpairs.txt") #this file is also an input file for the step of 'Creating eQTL annotate files'
+data <- readLines("Tissue.signifpairs.txt") #this file is also an input file in the step of 'Creating eQTL annotate files' above
 library(dplyr)
 gene <- c()
 bp <- c()
@@ -148,11 +153,11 @@ for (i in 1:length(data)){
 data1 <- data.frame(gene=gene,snp=snp,stringsAsFactors = F)
 
 b <- union(intersect(genepairs$gene1_name, data1$gene), intersect(genepairs$gene2_name, data1$gene)) #genes that can be expanded
-genepairs2 <- subset(genepairs,(genepairs$gene1_name%in%b) | (genepairs$gene2_name%in%b)) #gene pairs that exist at least one genes having eqtls
+genepairs1 <- subset(genepairs,(genepairs$gene1_name%in%b) | (genepairs$gene2_name%in%b)) #gene pairs that exist at least one genes having eqtls
 
-genepairs2 <- genepairs2[,-3:-5]
+genepairs2 <- genepairs1[,-3:-5]
 genepairs3 <- merge(genepairs2,data1,by.x='gene1_name',by.y='gene',all.x=T)
-names(genepairs3) <- c("gene1_name","gene2_name",'snp_of_gene1')
+names(genepairs3) <- c('gene1_name','gene2_name','snp_of_gene1')
 genepairs3 <- merge(genepairs3,data1,by.x='gene2_name',by.y='gene',all.x=T)
 genepairs3 <- genepairs3[,c(2,3,1,4)]
 names(genepairs3) <- c("gene1_name",'snp_of_gene1',"gene2_name",'snp_of_gene2')
@@ -166,10 +171,6 @@ gene1 <- genepairs4[,c(1,2)]
 gene2 <- genepairs4[,c(4,2)]
 names(gene2) <- names(gene1)
 gene_tot <- rbind(gene1,gene2) 
-gene_tot1 <- subset(gene_tot,gene_tot$gene1_name%in%gene_bp$V1) #genes after expanded
-names(gene_tot1) <- c("gene","snp")
-
-expanded_gene_eqtl <- gene_tot1 %>% group_by(gene) %>% summarise(snp = paste(snp, collapse = " "))
 
 #read gene loc
 gene_bp <- read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
@@ -178,8 +179,13 @@ gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
 gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
 gene_bp <- gene_bp[,c(1,2)]
 
-x <- merge(gene_bp,expanded_gene_eqtl,by.x="V1",by.y='gene',all.y=T)
-write.table(x,file="Intermediate.genes.annot",sep=" ",row.names=F,col.names=F,quote=F)
+gene_tot1 <- subset(gene_tot,gene_tot$gene1_name%in%gene_bp$V1) #the genes after expanded
+names(gene_tot1) <- c("gene","snp")
+
+tom_expanded_gene <- gene_tot1 %>% group_by(gene) %>% summarise(snp = paste(snp, collapse = " "))
+
+x <- merge(gene_bp, tom_expanded_gene, by.x="V1", by.y='gene', all.y=T)
+write.table(x, file="Intermediate.genes.annot", sep=" ", row.names=F, col.names=F, quote=F)
 
 #Remove duplicate SNPs on the same gene
 data <- readLines("Intermediate.genes.annot")
@@ -203,7 +209,7 @@ for (i in 1:length(temp)){
 ###############
 # Script Merge_annot_files.R is used in this step repeatedly to merge snp_to_gene.genes.annot, Tissue_Hi-C.genes.annot, Tissue_eqtl.genes.annot, Tissue_TOM.genes.annot.  
 # Then you get a final snp-to-gene annotate file, provided that it is named Tissue.merge.genes.annot.
-# In this step, you can also get annotate files of MAGMA+eQTL, MAGMA+Hi-C and MAGMA+Hi-C+eQTL, which were mentioned in our manuscript.
+# In this step, you can also get annotate files of MAGMA+ eQTL, MAGMA+ Hi-C and MAGMA+ Hi-C+ eQTL, which were mentioned in our manuscript.
 
 ###############
 ### Step 4 ###
