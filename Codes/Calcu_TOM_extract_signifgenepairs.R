@@ -109,17 +109,19 @@ TOM <- as.data.frame(TOM)
 #Extract strongly interacted gene pairs with TOM >= 0.15
 #==========================================================
 result <- data.frame(stringsAsFactors = FALSE) 
-for (i in 1:(nrow(TOM)-1)){
-  for (j in (i+1):nrow(TOM)){
-    if (TOM[i,j] >= 0.15){
-      tmp.result <- data.frame(rownames(TOM[i,]),rownames(TOM[j,]),TOM[i,j],i,j,stringsAsFactors = FALSE)
-      names(tmp.result) <- c('gene1','gene2','TOM','i','j')
-      result <- rbind(result, tmp.result)
-      names(result) <- c('gene1','gene2','TOM','i','j')
-      as.numeric(as.character(result[nrow(result),3])) 
-      as.numeric(as.character(result[nrow(result),4]))
-      as.numeric(as.character(result[nrow(result),5]))
-    }
+gene_name=row.names(TOM)
+for (k in 1:(nrow(TOM)-1)){
+  x=as.numeric(which(TOM[k+1:nrow(TOM),k]>0.15)+k)
+  if(length(x)!=0){  #区别numeric(0)和普通向量用length()
+    gene2_name=gene_name[x]
+    tom_val=TOM[x,k]
+    gene1_name=rep(gene_name[k],length(gene2_name))
+    tmp.result=data.frame(gene1_name=gene1_name,gene2_name=gene2_name,stringsAsFactors = FALSE)
+    tmp.result$tom_val=tom_val
+    tmp.result$row=k
+    tmp.result$col=x
+    result <- rbind(result, tmp.result)
   }
 }
+write.table(result, "Tissue.0.15.TOM.signifgenepairs.txt",row.names = F,col.names=T,sep="\t",quote=F)
 write.table(result, "Tissue.0.15.TOM.signifgenepairs.txt",row.names = F,col.names=T,sep="\t",quote=F)
