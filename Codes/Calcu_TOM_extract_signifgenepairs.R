@@ -124,4 +124,3 @@ for (k in 1:(nrow(TOM)-1)){
   }
 }
 write.table(result, "Tissue.0.15.TOM.signifgenepairs.txt",row.names = F,col.names=T,sep="\t",quote=F)
-write.table(result, "Tissue.0.15.TOM.signifgenepairs.txt",row.names = F,col.names=T,sep="\t",quote=F)
