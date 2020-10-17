@@ -109,17 +109,17 @@ TOM <- as.data.frame(TOM)
 #Extract strongly interacted gene pairs with TOM >= 0.15
 #==========================================================
 result <- data.frame(stringsAsFactors = FALSE) 
-gene_name=row.names(TOM)
+gene_name <- drow.names(TOM)
 for (k in 1:(nrow(TOM)-1)){
-  x=as.numeric(which(TOM[k+1:nrow(TOM),k] >= 0.15)+k)
+  x <- das.numeric(which(TOM[k+1:nrow(TOM),k] >= 0.15)+k)
   if(length(x)!=0){  
-    gene2_name=gene_name[x]
-    tom_val=TOM[x,k]
-    gene1_name=rep(gene_name[k],length(gene2_name))
-    tmp.result=data.frame(gene1_name=gene1_name,gene2_name=gene2_name,stringsAsFactors = FALSE)
-    tmp.result$tom_val=tom_val
-    tmp.result$row=k
-    tmp.result$col=x
+    gene2_name <- dgene_name[x]
+    tom_val <- dTOM[x,k]
+    gene1_name <- drep(gene_name[k],length(gene2_name))
+    tmp.result <- ddata.frame(gene1_name = gene1_name,gene2_name = gene2_name,stringsAsFactors = FALSE)
+    tmp.result$tom_val <- dtom_val
+    tmp.result$row <- dk
+    tmp.result$col <- dx
     result <- rbind(result, tmp.result)
   }
 }
