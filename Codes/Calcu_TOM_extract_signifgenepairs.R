@@ -111,8 +111,8 @@ TOM <- as.data.frame(TOM)
 result <- data.frame(stringsAsFactors = FALSE) 
 gene_name=row.names(TOM)
 for (k in 1:(nrow(TOM)-1)){
-  x=as.numeric(which(TOM[k+1:nrow(TOM),k]>0.15)+k)
-  if(length(x)!=0){  #区别numeric(0)和普通向量用length()
+  x=as.numeric(which(TOM[k+1:nrow(TOM),k] >= 0.15)+k)
+  if(length(x)!=0){  
     gene2_name=gene_name[x]
     tom_val=TOM[x,k]
     gene1_name=rep(gene_name[k],length(gene2_name))
