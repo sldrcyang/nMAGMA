@@ -2,28 +2,28 @@
 #Data preparation
 #====================
 setwd('/your path/')
-expro<-read.table("your expression data file name", header = T,  sep = "\t",check.names=F)
+expro <- read.table("your expression data file name", header = T,  sep = "\t",check.names=F)
 options(stringsAsFactors = FALSE)
 dim(expro)
 
 #Select genes in the top fifth of the variance across samples
-m.vars=apply(expro,1,var) 
-expro.upper=expro[which(m.vars>quantile(m.vars, probs = seq(0, 1, 0.2))[5]),]
+m.vars <- apply(expro,1,var) 
+expro.upper <- expro[which(m.vars>quantile(m.vars, probs = seq(0, 1, 0.2))[5]),]
 dim(expro.upper)
 write.table(expro.upper,file="geneInput_variancetop0.2.txt",sep='\t ',quote=F,row.names=T)
 
 #Transpose the expression matrix with rows are genes and columns are samples
-datExpr0=as.data.frame(t(expro.upper))
+datExpr0 <- as.data.frame(t(expro.upper))
 # Load the WGCNA package 
 library(WGCNA)
 #Qualify the expression matrix
-gsg = goodSamplesGenes(datExpr0, verbose = 3)
+gsg <- goodSamplesGenes(datExpr0, verbose = 3)
 gsg$allOK
 
 #======================================
 # Sample clustering to detect outliers
 #======================================
-sampleTree = hclust(dist(datExpr0), method = "average"); 
+sampleTree <- hclust(dist(datExpr0), method = "average"); 
 # Plot the sample tree: Open a graphic output window of size 12 by 9 inches 
 # The user should change the dimensions if the window is too large or too small. 
 sizeGrWindow(12,9) 
@@ -34,13 +34,13 @@ plot(sampleTree, main = "Sample clustering to detect outliers", sub="", xlab="",
 # Plot a line to show the cut 
 abline(h = 110000, col = "red"); 
 # Determine cluster under the line 
-clust = cutreeStatic(sampleTree, cutHeight = 110000, minSize = 10) 
+clust <- cutreeStatic(sampleTree, cutHeight = 110000, minSize = 10) 
 table(clust) 
 # clust 1 contains the samples we want to keep. 
-keepSamples = (clust==1) 
-datExpr = datExpr0[keepSamples, ]
-nGenes = ncol(datExpr) 
-nSamples = nrow(datExpr) 
+keepSamples <- (clust==1) 
+datExpr <- datExpr0[keepSamples, ]
+nGenes <- ncol(datExpr) 
+nSamples <- nrow(datExpr) 
 
 #=========================
 # Network constrution
@@ -60,9 +60,9 @@ enableWGCNAThreads()
 #  1) choose the most suitable soft threshold
 #==============================================
 # Choose a set of soft-thresholding powers 
-powers = c(c(1:10), seq(from = 12, to=24, by=2)) 
+powers <- c(c(1:10), seq(from = 12, to=24, by=2)) 
 # Call the network topology analysis function 
-sft = pickSoftThreshold(datExpr, powerVector = powers, verbose = 5)
+sft <- pickSoftThreshold(datExpr, powerVector = powers, verbose = 5)
 # Plot the results: 
 sizeGrWindow(9, 5) 
 par(mfrow = c(1,2)); 
@@ -82,12 +82,12 @@ plot(sft$fitIndices[,1], sft$fitIndices[,5],
 text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
 
 # here we define the adjacency matrix using soft thresholding with beta
-beta=sft$powerEstimate
-ADJ1=abs(cor(datExpr,use="p"))^beta
+beta <- sft$powerEstimate
+ADJ1 <- abs(cor(datExpr,use="p"))^beta
 # When you have relatively few genes (<5000) use the following code 
-k=as.vector(apply(ADJ1,2,sum, na.rm=T))#pick one of the two methods
+k <- as.vector(apply(ADJ1,2,sum, na.rm=T))#pick one of the two methods
 # When you have a lot of genes use the following code 
-k=softConnectivity(datE=datExpr,power=beta) 
+k <- softConnectivity(datE=datExpr,power=beta) 
 # Plot a histogram of k and a scale free topology plot 
 sizeGrWindow(10,5) 
 par(mfrow=c(1,2)) 
@@ -96,14 +96,14 @@ scaleFreePlot(k, main="Check scale free topology\n")
 #=======================================
 #  2) Calculate the adjacency matrix
 #=======================================
-softPower = beta; 
-adjacency = adjacency(datExpr, power = softPower) 
+softPower <- beta; 
+adjacency <- adjacency(datExpr, power = softPower) 
 #======================================================
 #  3) Calculate the final topological overlap matrix
 #======================================================
-TOM = TOMsimilarity(adjacency);
-dimnames(TOM)=dimnames(adjacency)
-TOM=as.data.frame(TOM)
+TOM <- TOMsimilarity(adjacency);
+dimnames(TOM) <- dimnames(adjacency)
+TOM <- as.data.frame(TOM)
 
 #==========================================================
 #Extract strongly interacted gene pairs with TOM >= 0.15
