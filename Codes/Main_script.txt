@@ -65,6 +65,7 @@ snp_to_gene <- snp_to_gene %>% group_by(gene) %>% summarise(snp = paste(snp, col
 
 # add gene coordinates
 gene_bp <- read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
+names(gene_bp) <- c("gene", "chr", "begin", "end")
 library(tidyr)
 gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
 gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
@@ -102,6 +103,7 @@ snp_to_gene <- signifpairs %>% group_by(gene) %>% summarise(snp = paste(snp, col
 
 # add gene coordinates (this step can also be performed directly in the Step 3, Merge_annot_files.R)
 gene_bp=read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
+names(gene_bp) <- c("gene", "chr", "begin", "end")
 library(tidyr)
 gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
 gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
@@ -174,6 +176,7 @@ gene_tot <- rbind(gene1,gene2)
 
 #read gene loc
 gene_bp <- read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
+names(gene_bp) <- c("gene", "chr", "begin", "end")
 library(tidyr)
 gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
 gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
