@@ -33,6 +33,7 @@ gene_bp2 <- data.frame(gene=gene,bp=bp,stringsAsFactors = FALSE)
 annot_comb <- rbind(annot1,annot2)
 #If the annotate files contains some non-coding genes, and you want retain only coding genes
 gene_bp=read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
+names(gene_bp) <- c("gene", "chr", "begin", "end")
 library(tidyr)
 gene_bp=tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
 gene_bp=tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
