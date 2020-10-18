@@ -156,8 +156,8 @@ for (i in 1:length(data)){
 }
 data1 <- data.frame(gene=gene,snp=snp,stringsAsFactors = F)
 
-b <- union(intersect(genepairs$gene1_name, data1$gene), intersect(genepairs$gene2_name, data1$gene)) #genes that can be expanded
-genepairs1 <- subset(genepairs,(genepairs$gene1_name%in%b) | (genepairs$gene2_name%in%b)) #gene pairs that exist at least one genes having eqtls
+b <- union(intersect(genepairs$gene1_name, data1$gene), intersect(genepairs$gene2_name, data1$gene)) #genes that are both in signif gene pairs and have eqtls
+genepairs1 <- subset(genepairs,(genepairs$gene1_name%in%b) | (genepairs$gene2_name%in%b)) #signif gene pairs that exist at least one genes having eqtls
 
 genepairs2 <- genepairs1[,-3:-5]
 genepairs3 <- merge(genepairs2,data1,by.x='gene1_name',by.y='gene',all.x=T)
