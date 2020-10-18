@@ -70,7 +70,8 @@ library(tidyr)
 gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
 gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
 gene_bp=gene_bp[,c(1,2)]
-final_snp_to_gene <- merge(snp_to_gene,gene_bp,by.x="gene",by.y="gene",all.x=T)
+
+final_snp_to_gene <- merge(snp_to_gene,gene_bp,by.x="gene",by.y="gene")
 write.table(final_snp_to_gene,"Intermediate.genes.annot",row.names = F,col.names=F,sep="\t",quote=F)
 
 #Remove duplicate SNPs on the same gene
@@ -108,7 +109,8 @@ library(tidyr)
 gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
 gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
 gene_bp <- gene_bp[,c(1,2)]
-final_snp_to_gene <- merge(snp_to_gene, gene_bp,by.x="gene",by.y="gene",all.x=T)
+
+final_snp_to_gene <- merge(snp_to_gene, gene_bp,by.x="gene",by.y="gene")
 write.table(final_snp_to_gene,"Intermediate.genes.annot",row.names = F,col.names=F,sep="\t",quote=F)
 
 #Remove duplicate SNPs on the same gene
@@ -184,10 +186,9 @@ gene_bp <- gene_bp[,c(1,2)]
 
 gene_tot1 <- subset(gene_tot,gene_tot$gene1_name%in%gene_bp$gene) #the genes after expanded
 names(gene_tot1) <- c("gene","snp")
-
 tom_expanded_gene <- gene_tot1 %>% group_by(gene) %>% summarise(snp = paste(snp, collapse = " "))
 
-x <- merge(gene_bp, tom_expanded_gene, by.x="V1", by.y='gene', all.y=T)
+x <- merge(gene_bp, tom_expanded_gene, by.x="gene", by.y='gene')
 write.table(x, file="Intermediate.genes.annot", sep=" ", row.names=F, col.names=F, quote=F)
 
 #Remove duplicate SNPs on the same gene
