@@ -72,14 +72,15 @@ gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
 gene_bp=gene_bp[,c(1,2)]
 
 final_snp_to_gene <- merge(snp_to_gene,gene_bp,by.x="gene",by.y="gene")
-write.table(final_snp_to_gene,"Intermediate.genes.annot",row.names = F,col.names=F,sep="\t",quote=F)
+final_snp_to_gene <- final_snp_to_gene[,c(1,3,2)]
+write.table(final_snp_to_gene,"Intermediate.genes.annot",row.names = F,col.names=F,sep=" ",quote=F)
 
 #Remove duplicate SNPs on the same gene
 data <- readLines("Intermediate.genes.annot")
 data <- as.list(data)
 temp <- list()
 for(i in 1:length(data)){
-  temp[[i]] <- unlist(strsplit(data[[i]], "\t"))
+  temp[[i]] <- unlist(strsplit(data[[i]], " "))
   temp[[i]] <- as.vector(temp[[i]])
   temp[[i]] <- unique(temp[[i]])
 }
@@ -111,14 +112,14 @@ gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
 gene_bp <- gene_bp[,c(1,2)]
 
 final_snp_to_gene <- merge(snp_to_gene, gene_bp,by.x="gene",by.y="gene")
-write.table(final_snp_to_gene,"Intermediate.genes.annot",row.names = F,col.names=F,sep="\t",quote=F)
+write.table(final_snp_to_gene,"Intermediate.genes.annot",row.names = F,col.names=F,sep=" ",quote=F)
 
 #Remove duplicate SNPs on the same gene
 data <- readLines("Intermediate.genes.annot")
 data <- as.list(data)
 temp <- list()
 for(i in 1:length(data)){
-  temp[[i]] <- unlist(strsplit(data[[i]], "\t"))
+  temp[[i]] <- unlist(strsplit(data[[i]], " "))
   temp[[i]] <- as.vector(temp[[i]])
   temp[[i]] <- unique(temp[[i]])
 }
