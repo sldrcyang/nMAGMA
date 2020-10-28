@@ -221,7 +221,7 @@ for (i in 1:length(temp)){
 ###############
 # Perform gene analysis using MAGMA
 magma_v1.07b_static/magma --bfile g1000_eur \
---pval GWAS_summary.txt \
+--pval GWAS_summary.txt N=[N]\
 --gene-annot Tissue.merge.genes.annot \
 --gene-model snp-wise=mean \
 --out Tissue.merge.gene_analysis.mean
