@@ -43,37 +43,37 @@ magma_v1.07b_static/magma –annotate \
 # For creating Hi-C annotate files, we assign the SNPs to genes via SNP-to-RE annotations and RE-gene regulatory pairs.
 
 snp_to_re <- readLines("snp_to_re.genes.annot")
-re_to_gene <- read.table("3DIV_Tissue_RE_to_genes.txt",header = F,  sep = "\t",stringsAsFactors = F)
+re_to_gene <- read.table("3DIV_Tissue_RE_to_genes.txt", header = F,  sep = "\t", stringsAsFactors = F)
 library(dplyr)
 re <- c()
 snp <- c()
 for(i in 1:length(snp_to_re)){
   temp <- unlist(strsplit(snp_to_re[i], "\t"))
   re[i] <- temp[1]
-  snp[i] <- paste(temp[-2:-1],collapse=" ")
+  snp[i] <- paste(temp[-2:-1], collapse=" ")
 }
-snp_to_re2 <- data.frame(re=re,snp=snp,stringsAsFactors = FALSE)
-b <- intersect(re_to_gene[,1],snp_to_re2[,1])
+snp_to_re2 <- data.frame(re=re, snp=snp, stringsAsFactors = FALSE)
+b <- intersect(re_to_gene[,1], snp_to_re2[,1])
 b <- as.vector(b)
-re_to_gene <- subset(re_to_gene,re_to_gene$V1%in%b)
-snp_to_re2 <- subset(snp_to_re2,snp_to_re2[,1]%in%b)
-snp_to_gene <- merge(re_to_gene,snp_to_re2,by.x="V1",by.y="re",all.x=T)
+re_to_gene <- subset(re_to_gene, re_to_gene$V1%in%b)
+snp_to_re2 <- subset(snp_to_re2, snp_to_re2[,1]%in%b)
+snp_to_gene <- merge(re_to_gene, snp_to_re2, by.x="V1", by.y="re", all.x=T)
 snp_to_gene <- snp_to_gene[,-1]
 
-names(snp_to_gene)=c("gene","snp")
+names(snp_to_gene)=c("gene", "snp")
 snp_to_gene <- snp_to_gene %>% group_by(gene) %>% summarise(snp = paste(snp, collapse = " "))
 
 # add gene coordinates
-gene_bp <- read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
+gene_bp <- read.table("protein_coding_gene.loc", header = F,  sep = "\t", stringsAsFactors = F)
 names(gene_bp) <- c("gene", "chr", "begin", "end")
 library(tidyr)
 gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
 gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
 gene_bp=gene_bp[,c(1,2)]
 
-final_snp_to_gene <- merge(snp_to_gene,gene_bp,by.x="gene",by.y="gene")
+final_snp_to_gene <- merge(snp_to_gene, gene_bp, by.x="gene", by.y="gene")
 final_snp_to_gene <- final_snp_to_gene[,c(1,3,2)]
-write.table(final_snp_to_gene,"Intermediate.genes.annot",row.names = F,col.names=F,sep=" ",quote=F)
+write.table(final_snp_to_gene, "Intermediate.genes.annot", row.names = F, col.names = F, sep=" ", quote=F)
 
 #Remove duplicate SNPs on the same gene
 data <- readLines("Intermediate.genes.annot")
@@ -104,15 +104,15 @@ names(signifpairs) <- c('gene', 'snp')
 snp_to_gene <- signifpairs %>% group_by(gene) %>% summarise(snp = paste(snp, collapse = " "))
 
 # add gene coordinates (this step can also be performed directly in the Step 3, Merge_annot_files.R)
-gene_bp=read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
+gene_bp=read.table("protein_coding_gene.loc", header = F,  sep = "\t", stringsAsFactors = F)
 names(gene_bp) <- c("gene", "chr", "begin", "end")
 library(tidyr)
 gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
 gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
 gene_bp <- gene_bp[,c(1,2)]
 
-final_snp_to_gene <- merge(snp_to_gene, gene_bp,by.x="gene",by.y="gene")
-write.table(final_snp_to_gene,"Intermediate.genes.annot",row.names = F,col.names=F,sep=" ",quote=F)
+final_snp_to_gene <- merge(snp_to_gene, gene_bp, by.x="gene", by.y="gene")
+write.table(final_snp_to_gene, "Intermediate.genes.annot", row.names = F, col.names=F, sep=" ", quote=F)
 
 #Remove duplicate SNPs on the same gene
 data <- readLines("Intermediate.genes.annot")
@@ -125,8 +125,8 @@ for(i in 1:length(data)){
 }
 file.remove('Intermediate.genes.annot')
 for(i in 1:length(temp)){
-  cat(temp[[i]], file = " Tissue_eqtl.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
-  cat("\n", file = " Tissue_eqtl.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
+  cat(temp[[i]], file = " Tissue_eqtl.genes.annot", sep = "\t", fill = FALSE, labels = NULL, append = TRUE)
+  cat("\n", file = " Tissue_eqtl.genes.annot", sep = "\t", fill = FALSE, labels = NULL, append = TRUE)
 }
 
 #=============================================================================================================================
@@ -153,40 +153,40 @@ for (i in 1:length(data)){
   temp <- unlist(strsplit(data[i], "\t"))
   gene[i] <- temp[1]
   bp[i] <- temp[2]
-  snp[i] <- paste(temp[-2:-1],collapse = " ")
+  snp[i] <- paste(temp[-2:-1], collapse = " ")
 }
-data1 <- data.frame(gene=gene,snp=snp,stringsAsFactors = F)
+data1 <- data.frame(gene=gene, snp=snp, stringsAsFactors = F)
 
 b <- union(intersect(genepairs$gene1_name, data1$gene), intersect(genepairs$gene2_name, data1$gene)) #genes that are both in signif gene pairs and have eqtls
 genepairs1 <- subset(genepairs,(genepairs$gene1_name%in%b) | (genepairs$gene2_name%in%b)) #signif gene pairs that exist at least one genes having eqtls
 
 genepairs2 <- genepairs1[,-3:-5]
-genepairs3 <- merge(genepairs2,data1,by.x='gene1_name',by.y='gene',all.x=T)
-names(genepairs3) <- c('gene1_name','gene2_name','snp_of_gene1')
-genepairs3 <- merge(genepairs3,data1,by.x='gene2_name',by.y='gene',all.x=T)
+genepairs3 <- merge(genepairs2, data1, by.x='gene1_name', by.y='gene',all.x=T)
+names(genepairs3) <- c('gene1_name', 'gene2_name', 'snp_of_gene1')
+genepairs3 <- merge(genepairs3, data1, by.x='gene2_name', by.y='gene', all.x=T)
 genepairs3 <- genepairs3[,c(2,3,1,4)]
-names(genepairs3) <- c("gene1_name",'snp_of_gene1',"gene2_name",'snp_of_gene2')
+names(genepairs3) <- c("gene1_name", 'snp_of_gene1', "gene2_name", 'snp_of_gene2')
 
 genepairs3[is.na(genepairs3)] <- "" 
 
 library(tidyr)
 genepairs4 <- tidyr::unite(genepairs3, "snp1+snp2", snp_of_gene1, snp_of_gene2, sep = " ", remove = F)
-genepairs4$`snp1+snp2`=trimws(genepairs4$`snp1+snp2`,"both") #Remove spaces at both ends
+genepairs4$`snp1+snp2`=trimws(genepairs4$`snp1+snp2`, "both") #Remove spaces at both ends
 gene1 <- genepairs4[,c(1,2)]
 gene2 <- genepairs4[,c(4,2)]
 names(gene2) <- names(gene1)
-gene_tot <- rbind(gene1,gene2) 
+gene_tot <- rbind(gene1, gene2) 
 
 #read gene loc
-gene_bp <- read.table("protein_coding_gene.loc", header = F,  sep = "\t",stringsAsFactors = F)
+gene_bp <- read.table("protein_coding_gene.loc", header = F,  sep = "\t", stringsAsFactors = F)
 names(gene_bp) <- c("gene", "chr", "begin", "end")
 library(tidyr)
 gene_bp <- tidyr::unite(gene_bp, "bp", chr, begin, sep = ":")
 gene_bp <- tidyr::unite(gene_bp, "bp", bp, end, sep = ":")
 gene_bp <- gene_bp[,c(1,2)]
 
-gene_tot1 <- subset(gene_tot,gene_tot$gene1_name%in%gene_bp$gene) #the genes after expanded
-names(gene_tot1) <- c("gene","snp")
+gene_tot1 <- subset(gene_tot, gene_tot$gene1_name%in%gene_bp$gene) #the genes after expanded
+names(gene_tot1) <- c("gene", "snp")
 tom_expanded_gene <- gene_tot1 %>% group_by(gene) %>% summarise(snp = paste(snp, collapse = " "))
 
 x <- merge(gene_bp, tom_expanded_gene, by.x="gene", by.y='gene')
@@ -204,8 +204,8 @@ for(i in 1:length(data)){
 }
 file.remove('Intermediate.genes.annot')
 for (i in 1:length(temp)){
-  cat(temp[[i]], file = "Tissue_TOM.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
-  cat("\n", file = "Tissue_TOM.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
+  cat(temp[[i]], file = "Tissue_TOM.genes.annot", sep = "\t", fill = FALSE, labels = NULL, append = TRUE)
+  cat("\n", file = "Tissue_TOM.genes.annot", sep = "\t", fill = FALSE, labels = NULL, append = TRUE)
 }
 
 
