@@ -7,10 +7,10 @@ options(stringsAsFactors = FALSE)
 dim(expro)
 
 #Select genes in the top fifth of the variance across samples
-m.vars <- apply(expro,1,var) 
+m.vars <- apply(expro, 1, var) 
 expro.upper <- expro[which(m.vars>quantile(m.vars, probs = seq(0, 1, 0.2))[5]),]
 dim(expro.upper)
-write.table(expro.upper,file="geneInput_variancetop0.2.txt",sep='\t ',quote=F,row.names=T)
+write.table(expro.upper, file="geneInput_variancetop0.2.txt", sep='\t ', quote=F, row.names=T)
 
 #Transpose the expression matrix with rows are genes and columns are samples
 datExpr0 <- as.data.frame(t(expro.upper))
@@ -29,7 +29,7 @@ sampleTree <- hclust(dist(datExpr0), method = "average");
 sizeGrWindow(12,9) 
 #pdf(file = "Plots/sampleClustering.pdf", width = 12, height = 9); 
 par(cex = 0.45); par(mar = c(0,4,2,0)) 
-plot(sampleTree, main = "Sample clustering to detect outliers", sub="", xlab="",cex.lab = 1.5, cex.axis = 1.5, cex.main = 2) 
+plot(sampleTree, main = "Sample clustering to detect outliers", sub="", xlab="", cex.lab = 1.5, cex.axis = 1.5, cex.main = 2) 
 
 # Plot a line to show the cut 
 abline(h = 110000, col = "red"); 
@@ -71,7 +71,7 @@ cex1 = 0.9;
 plot(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[, 2],xlab="Soft Threshold (power)",ylab="Scale Free Topology Model Fit,signed R^2",type="n",
      main = paste("Scale independence")); text(sft$fitIndices[,1], -sign(sft$fitIndices[,3])*sft$fitIndices[, 2],
        labels=powers,cex=cex1,col="red"); # this line corresponds to using an R^2 cut-off of h 
-abline(h=0.85,col="red")
+abline(h=0.85, col="red")
 sft$powerEstimate #your suitable soft-thresholding
 
 #Mean connectivity
@@ -79,15 +79,15 @@ sft$powerEstimate #your suitable soft-thresholding
 plot(sft$fitIndices[,1], sft$fitIndices[,5],     
      xlab="Soft Threshold (power)",ylab="Mean Connectivity", type="n",     
      main = paste("Mean connectivity"))
-text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1,col="red")
+text(sft$fitIndices[,1], sft$fitIndices[,5], labels=powers, cex=cex1, col="red")
 
 # here we define the adjacency matrix using soft thresholding with beta
 beta <- sft$powerEstimate
 ADJ1 <- abs(cor(datExpr,use="p"))^beta
 # When you have relatively few genes (<5000) use the following code 
-k <- as.vector(apply(ADJ1,2,sum, na.rm=T))#pick one of the two methods
+k <- as.vector(apply(ADJ1, 2, sum, na.rm=T))#pick one of the two methods
 # When you have a lot of genes use the following code 
-k <- softConnectivity(datE=datExpr,power=beta) 
+k <- softConnectivity(datE=datExpr, power=beta) 
 # Plot a histogram of k and a scale free topology plot 
 sizeGrWindow(10,5) 
 par(mfrow=c(1,2)) 
@@ -115,12 +115,12 @@ for (k in 1:(nrow(TOM)-1)){
   if(length(x)!=0){  
     gene2_name <- gene_name[x]
     tom_val <- TOM[x,k]
-    gene1_name <- rep(gene_name[k],length(gene2_name))
-    tmp.result <- data.frame(gene1_name = gene1_name,gene2_name = gene2_name,stringsAsFactors = FALSE)
+    gene1_name <- rep(gene_name[k], length(gene2_name))
+    tmp.result <- data.frame(gene1_name = gene1_name, gene2_name = gene2_name, stringsAsFactors = FALSE)
     tmp.result$tom_val <- tom_val
     tmp.result$row <- k
     tmp.result$col <- x
     result <- rbind(result, tmp.result)
   }
 }
-write.table(result, "Tissue.0.15.TOM.signifgenepairs.txt",row.names = F,col.names=T,sep="\t",quote=F)
+write.table(result, "Tissue.0.15.TOM.signifgenepairs.txt", row.names = F, col.names=T, sep="\t", quote=F)
