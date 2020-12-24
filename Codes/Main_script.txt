@@ -13,21 +13,37 @@
 # Before analyzing, you should unify the gene and snp coordinate formats between different resources; 
 # In our manuscript, the protein-coding gene loc we used are all transformed to Ensembl (GRCH37 v87), the SNPs are transformed to dbSNP (version 151), and the regulatory elements (REs) defined in ENCODE [27] (https://www.encodeproject.org/files/ENCFF301VRH/) and Ensembl (ftp://ftp.ensembl.org/pub/grch37/release-94/regulation/homo_sapiens/). 
 
+# Our initial results were derived from MAGMA v.1.07b, and we updated the code using MAGMA v.1.08b.
 
 ###############
 ### Step 1 ### 
 ###############
-# Annotate SNPs to genes
+### Annotate SNPs to genes
+## initial
 magma_v1.07b_static/magma –annotate \
 --snp-loc SNPLOC.txt \
 --gene-loc protein_coding_gene.loc \
 --out snp_to_gene
 
-# Annotate SNPs to REs
+## updated
+magma_v1.08b_static/magma –annotate \
+--snp-loc SNPLOC.txt \
+--gene-loc protein_coding_gene.loc \
+--out snp_to_gene
+
+### Annotate SNPs to REs
+## initial
 magma_v1.07b_static/magma –annotate \
 --snp-loc SNPLOC.txt \
 --gene-loc RELOC.txt \
 --out snp_to_re
+
+## updated
+magma_v1.08b_static/magma –annotate \
+--snp-loc SNPLOC.txt \
+--gene-loc RELOC.txt \
+--out snp_to_re
+
 
 
 ###############
@@ -90,6 +106,7 @@ for(i in 1:length(temp)){
   cat("\n", file = "Tissue_Hi-C.genes.annot", sep = "\t", fill = FALSE, labels = NULL,append = TRUE)
 }
 
+
 #==============================
 # Create eQTL annotate files
 #==============================
@@ -128,6 +145,7 @@ for(i in 1:length(temp)){
   cat(temp[[i]], file = " Tissue_eqtl.genes.annot", sep = "\t", fill = FALSE, labels = NULL, append = TRUE)
   cat("\n", file = " Tissue_eqtl.genes.annot", sep = "\t", fill = FALSE, labels = NULL, append = TRUE)
 }
+
 
 #=============================================================================================================================
 # For calculating significant gene pairs based on their expression data, script Calcu_TOM_extract_signifgenepairs.R is used;
@@ -209,6 +227,7 @@ for (i in 1:length(temp)){
 }
 
 
+
 ###############
 ### Step 3 ###
 ###############
@@ -216,26 +235,51 @@ for (i in 1:length(temp)){
 # Then you get a final snp-to-gene annotate file, provided that it is named Tissue.merge.genes.annot.
 # In this step, you can also get annotate files of MAGMA+ eQTL, MAGMA+ Hi-C and MAGMA+ Hi-C+ eQTL, which were mentioned in our manuscript.
 
+
+
 ###############
 ### Step 4 ###
 ###############
-# Perform gene analysis using MAGMA
+### Perform gene analysis using MAGMA
+## intial
 magma_v1.07b_static/magma --bfile g1000_eur \
 --pval GWAS_summary.txt N=[N]\
 --gene-annot Tissue.merge.genes.annot \
 --gene-model snp-wise=mean \
 --out Tissue.merge.gene_analysis.mean
 
-# Meta analysis
+## updated
+magma_v1.08b_static/magma --bfile g1000_eur \
+--pval GWAS_summary.txt N=[N]\
+--gene-annot Tissue.merge.genes.annot \
+--gene-model snp-wise=mean \
+--out Tissue.merge.gene_analysis.mean
+
+
+### Meta analysis
 # If you have  several GWAS summary datasets, your can merge them using MAGMA
+## initial
 magma_v1.07b_static/magma --meta raw= Tissue.merge1.gene_analysis.mean.genes.raw, Tissue.merge2.gene_analysis.mean.genes.raw \
 --out Tissue.merge.gene_analysis.mean
+
+## updated
+magma_v1.08b_static/magma --meta raw= Tissue.merge1.gene_analysis.mean.genes.raw, Tissue.merge2.gene_analysis.mean.genes.raw \
+--out Tissue.merge.gene_analysis.mean
+
 
 
 ###############
 ### Step 5 ###
 ###############
-# Perform gene-set analysis using MAGMA
+### Perform gene-set analysis using MAGMA
+## initial
 magma_v1.07b_static/magma --gene-results Tissue.merge.gene_analysis.mean.genes.raw \
 --set-annot gene-set.txt \
 --out Tissue.merge.geneset_analysis.mean
+
+## updated
+magma_v1.08b_static/magma --gene-results Tissue.merge.gene_analysis.mean.genes.raw \
+--set-annot gene-set.txt \
+--out Tissue.merge.geneset_analysis.mean
+
+
