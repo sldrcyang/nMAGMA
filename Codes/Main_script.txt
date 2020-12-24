@@ -1,7 +1,7 @@
 # This is a tutorial on how to conduct nMAGMA, which can be used to reproduce the results in our manuscript. 
 # There are totally 5 steps to retain the final nMAGMA results.
 
-# nMAGMA is performed on R and MAGMA version 1.07b, downloaded from [MAGMA v1.07b (https://ctg.cncr.nl/software/magma)]
+# The initial nMAGMA is performed on R and MAGMA version 1.07b, downloaded from [https://ctg.cncr.nl/software/magma]. As the revised version of MAGMA (MAGMA v.1.08b) can better controls for the potential type I error rate inflation, we updated the code using MAGMA v.1.08b.
 
 ## Data summary
 # The SCZ GWAS summary = scz.swe.pgc1.2013-11b.zip and 49eur.daner_PGC_SCZ49.sh2_mds10_1000G-frq_2.gz can be downloaded from PGC database: https://www.med.unc.edu/pgc/download-results/scz/
@@ -13,7 +13,6 @@
 # Before analyzing, you should unify the gene and snp coordinate formats between different resources; 
 # In our manuscript, the protein-coding gene loc we used are all transformed to Ensembl (GRCH37 v87), the SNPs are transformed to dbSNP (version 151), and the regulatory elements (REs) defined in ENCODE [27] (https://www.encodeproject.org/files/ENCFF301VRH/) and Ensembl (ftp://ftp.ensembl.org/pub/grch37/release-94/regulation/homo_sapiens/). 
 
-# Our initial results were derived from MAGMA v.1.07b, and we updated the code using MAGMA v.1.08b.
 
 ###############
 ### Step 1 ### 
