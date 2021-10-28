@@ -15,7 +15,8 @@
 # The protein-coding gene loc we used are all transformed to Ensembl (GRCH37 v87), the SNPs are transformed to dbSNP (version 151);
 
 # The regulatory elements (REs) is defined in ENCODE and Ensembl. We attach the two zip files in the RELOC folder for use: 'combined_regulatory_elements_for_hg19.bed.zip' and 'combined_regulatory_elements_for_hg38.bed.zip'. 
-# As this paper depends on the hg19 loc version, we have first transformed the 'combined_regulatory_elements_for_hg19.bed.zip' to MAGMA format of 'RELOC_hg19.txt'. You can directly use 'RELOC_hg19.txt' in the RELOC folder, or transformed the 'combined_regulatory_elements_for_hg38.bed.zip' to MAGMA format yourself which is very conventient. Besides, we don't use chromsome X, Y and GL in this paper. 
+# As this paper depends on the hg19 loc version, we have first transformed the 'combined_regulatory_elements_for_hg19.bed.zip' to MAGMA format of 'RELOC_hg19.txt'. 
+# You can directly use 'RELOC_hg19.txt' in the RELOC folder, or transformed the 'combined_regulatory_elements_for_hg38.bed.zip' to MAGMA format yourself which is very conventient. Besides, we don't use chromsome X, Y and GL in this paper. 
 
 
 ###############
