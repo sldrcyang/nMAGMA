@@ -8,10 +8,13 @@
 
 # For eQTL data and gene expression data, we downloaded them at GTEx database: https://storage.googleapis.com/gtex_analysis_v8/single_tissue_qtl_data/GTEx_Analysis_v8_eQTL.tar; https://storage.googleapis.com/gtex_analysis_v8/rna_seq_data/GTEx_Analysis_2017-06-05_v8_RNASeQCv1.1.9_gene_median_tpm.gct.gz
 
-# For Hi-C data, we download them at 3D-genome Interaction Viewer and database:  http://kobic.kr/3div.
+# For Hi-C data, we download them at 3D-genome Interaction Viewer and database:  http://kobic.kr/3div. We attach the data we used in RE_to_genes.zip.
 
 # Before analyzing, you should unify the gene and snp coordinate formats between different resources; 
-# In our manuscript, the protein-coding gene loc we used are all transformed to Ensembl (GRCH37 v87), the SNPs are transformed to dbSNP (version 151), and the regulatory elements (REs) defined in ENCODE [27] (https://www.encodeproject.org/files/ENCFF301VRH/) and Ensembl (ftp://ftp.ensembl.org/pub/grch37/release-94/regulation/homo_sapiens/). 
+
+# The protein-coding gene loc we used are all transformed to Ensembl (GRCH37 v87), the SNPs are transformed to dbSNP (version 151);
+
+# The regulatory elements (REs) is defined in ENCODE and Ensembl. We attach the two zip files in the RELOC folder for use: 'combined_regulatory_elements_for_hg19.bed.zip' and 'combined_regulatory_elements_for_hg38.bed.zip'. As this paper depends on the hg19 loc version, we have first transformed the 'combined_regulatory_elements_for_hg19.bed.zip' to MAGMA format of 'RELOC_hg19.txt'. You can directly use 'RELOC_hg19.txt' in the RELOC folder, or transformed the 'combined_regulatory_elements_for_hg38.bed.zip' to MAGMA format yourself which is very conventient. Besides, we don't use chromsome X, Y and GL in this paper. 
 
 
 ###############
@@ -154,6 +157,7 @@ for(i in 1:length(temp)){
 # Gene2 Gene4 tol_val3 row_num3 col_num3
 # ...   ...
 #=============================================================================================================================
+
 
 #==============================
 # Create TOM annotate files
